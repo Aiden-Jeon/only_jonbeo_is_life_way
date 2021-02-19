@@ -9,6 +9,7 @@ class Trader:
         self.balance = seed_money
         self.wallet = wallet
         self.avg_price = 0
+        self.prev_data = None
 
     def sell_or_buy(self, data: pd.DataFrame) -> Tuple[str, float, float]:
         # init
@@ -55,3 +56,14 @@ class Trader:
             elif action == "sell":
                 self.wallet -= volume
                 self.balance += volume * price
+
+    def run_trade(self, data):
+        if self.prev_data is None:
+            action = "do nothing"
+            price = 0
+            volume = 0
+            self.prev_data = data
+        else:
+            action, price, volume = self.sell_or_buy(data)
+            self.prev_data = data
+        return action, price, volume
