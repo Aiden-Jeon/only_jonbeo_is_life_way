@@ -4,7 +4,7 @@ from tester import BackTester
 
 
 def main():
-    url = "https://api.upbit.com/v1/candles/minutes/10"
+    url = "https://api.upbit.com/v1/candles/minutes/30"
     data = get_timepoint_ohlcv(url, count=200).drop("volume", axis=1)
     trader = Trader()
     tester = BackTester()

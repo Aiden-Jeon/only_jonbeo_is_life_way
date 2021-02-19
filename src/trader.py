@@ -11,24 +11,24 @@ class Trader:
         self.avg_price = 0
         self.prev_data = None
 
-    def sell_or_buy(self, data: pd.DataFrame) -> Tuple[str, float, float]:
+    def sell_or_buy(self, prev_data: pd.DataFrame) -> Tuple[str, float, float]:
         # init
         coin = random.uniform(-1, 1)
         if coin < 0:
             action = "buy"
-            price = self.how_much_to_buy(data)
+            price = self.how_much_to_buy(prev_data)
             volume = 1
         else:
             action = "sell"
-            price = self.how_much_to_sell(data)
+            price = self.how_much_to_sell(prev_data)
             volume = 1
         # policy
         if self.wallet == 0:
             action = "buy"
-            price = self.how_much_to_buy(data)
+            price = self.how_much_to_buy(prev_data)
             volume = 1
         elif action == "sell":
-            if price <= self.avg_price:
+            if price <= self.avg_price * 0.95:
                 action = "not sell"
         return action, price, volume
 
@@ -49,11 +49,15 @@ class Trader:
     ) -> None:
         if result:
             if action == "buy":
+                if volume * price > self.balance:
+                    volume = self.balance // price
                 self.avg_price = self.wallet * self.avg_price + volume * price
                 self.wallet += volume
                 self.avg_price /= self.wallet
                 self.balance -= volume * price
             elif action == "sell":
+                if self.wallet < volume:
+                    volume = self.wallet
                 self.wallet -= volume
                 self.balance += volume * price
 
@@ -62,8 +66,7 @@ class Trader:
             action = "do nothing"
             price = 0
             volume = 0
-            self.prev_data = data
         else:
             action, price, volume = self.sell_or_buy(self.prev_data)
-            self.prev_data = data
+        self.prev_data = data
         return action, price, volume
