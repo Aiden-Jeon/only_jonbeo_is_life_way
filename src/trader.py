@@ -64,6 +64,6 @@ class Trader:
             volume = 0
             self.prev_data = data
         else:
-            action, price, volume = self.sell_or_buy(data)
+            action, price, volume = self.sell_or_buy(self.prev_data)
             self.prev_data = data
         return action, price, volume
